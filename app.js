@@ -153,27 +153,48 @@ document.addEventListener("DOMContentLoaded", () => {
   render();
 });
 async function loadProductsFromSupabase() {
-  const response = await fetch(
-    `${SUPABASE_URL}/rest/v1/products?select=*&order=id.asc`,
-    {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/products?select=*&order=id.asc`,
+      {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`
+        }
       }
+    );
+
+    if (!response.ok) {
+      console.error("Supabase products error:", await response.text());
+      return;
     }
-  );
 
-  if (!response.ok) {
-    console.error("Supabase error:", await response.text());
-    return;
+    const data = await response.json();
+
+    if (!Array.isArray(data) || !data.length) {
+      console.log("Supabase connected, but no products found yet.");
+      return;
+    }
+
+    console.log("Supabase products loaded:", data);
+
+    data.forEach(dbProduct => {
+      const existingProduct = products.find(
+        product => product.id === dbProduct.id
+      );
+
+      if (existingProduct) {
+        existingProduct.brand = dbProduct.brand;
+        existingProduct.image = dbProduct.image_url;
+        existingProduct.description = dbProduct.description;
+      }
+    });
+
+    render(products);
+
+  } catch (error) {
+    console.error("Supabase connection error:", error);
   }
-
-  const data = await response.json();
-
-  if (!Array.isArray(data) || !data.length) {
-    return;
-  }
-
-  console.log("Supabase products loaded:", data);
 }
+
 loadProductsFromSupabase();
