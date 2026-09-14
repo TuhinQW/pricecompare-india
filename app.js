@@ -176,3 +176,4 @@ async function loadProductsFromSupabase() {
 
   console.log("Supabase products loaded:", data);
 }
+loadProductsFromSupabase();
