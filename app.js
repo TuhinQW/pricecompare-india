@@ -152,3 +152,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   render();
 });
+async function loadProductsFromSupabase() {
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/products?select=*&order=id.asc`,
+    {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    console.error("Supabase error:", await response.text());
+    return;
+  }
+
+  const data = await response.json();
+
+  if (!Array.isArray(data) || !data.length) {
+    return;
+  }
+
+  console.log("Supabase products loaded:", data);
+}
