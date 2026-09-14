@@ -1,6 +1,5 @@
 const SUPABASE_URL = "https://vssthkgpibacnxczrlgp.supabase.co";
 const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
-
 const products = [
   {
     id: 1,
