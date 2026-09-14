@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PriceCompare India — Compare Before You Buy</title>
+<meta name="description" content="Compare prices, ratings and buying information across Amazon and Flipkart before you buy.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">Independent price comparison for Indian shoppers · Prices shown are illustrative until live APIs are connected.</div>
+<header class="header"><div class="container nav">
+<a class="brand" href="index.html"><span class="brandmark">P</span><span>PriceCompare<span class="muted"> India</span></span></a>
+<nav><a href="#categories">Categories</a><a href="#deals">Deals</a><a href="#guides">Buying Guides</a><a href="about.html">About</a></nav>
+<a class="navbtn" href="#search">Search</a>
+</div></header>
+<main>
+<section class="hero"><div class="container hero-grid">
+<div>
+<div class="eyebrow">COMPARE • DECIDE • BUY SMART</div>
+<h1>Find the better price.<br><span>Make the better buy.</span></h1>
+<p class="hero-copy">Compare marketplace prices, ratings and key buying information in one clean place — before you click Buy.</p>
+<div class="searchbox" id="search">
+<input id="searchInput" placeholder="Search earbuds, watches, laptops, power banks…" autocomplete="off">
+<button onclick="searchProducts()">Search</button>
+</div>
+<div class="chips"><button onclick="quick('earbuds')">Earbuds</button><button onclick="quick('watch')">Watches</button><button onclick="quick('power bank')">Power Banks</button><button onclick="quick('laptop')">Laptops</button></div>
+</div>
+<div class="hero-card"><div class="mini-label">TODAY'S COMPARISON</div><div class="hero-product">boAt Airdopes 141</div><div class="hero-price"><span>₹1,099</span><small>lowest listed demo price</small></div><div class="split"><div><b>Amazon</b><strong>₹1,199</strong></div><div><b>Flipkart</b><strong>₹1,099</strong></div></div><div class="save">Potential saving: ₹100</div><p class="tiny">Demo data — live marketplace APIs will replace these values.</p></div>
+</div></section>
+<section class="section" id="categories"><div class="container">
+<div class="section-head"><div><div class="eyebrow">SHOP BY CATEGORY</div><h2>What are you looking for?</h2></div><a href="#deals">View deals →</a></div>
+<div class="category-grid">
+<a class="category" href="#" onclick="quick('earbuds');return false"><span>🎧</span><b>Audio</b><small>Earbuds & speakers</small></a>
+<a class="category" href="#" onclick="quick('watch');return false"><span>⌚</span><b>Watches</b><small>Smart & classic</small></a>
+<a class="category" href="#" onclick="quick('power bank');return false"><span>🔋</span><b>Accessories</b><small>Power & mobile</small></a>
+<a class="category" href="#" onclick="quick('laptop');return false"><span>💻</span><b>Computers</b><small>Laptops & gear</small></a>
+<a class="category" href="#"><span>🏠</span><b>Home</b><small>Useful essentials</small></a>
+<a class="category" href="#"><span>🏍️</span><b>Automotive</b><small>Bike & car gear</small></a>
+</div></div></section>
+<section class="section soft" id="deals"><div class="container">
+<div class="section-head"><div><div class="eyebrow">SMART PICKS</div><h2>Popular comparisons</h2></div><span class="muted">Updated when marketplace data is connected</span></div>
+<div id="results" class="product-grid"></div>
+</div></section>
+<section class="section" id="guides"><div class="container">
+<div class="eyebrow">BUYING GUIDES</div><h2>Useful answers before you spend</h2>
+<div class="guide-grid">
+<article class="guide"><span>01</span><h3>Best Earbuds Under ₹1,500</h3><p>What actually matters: sound, mic quality, battery, codec support and warranty.</p><a href="guide-earbuds.html">Read guide →</a></article>
+<article class="guide"><span>02</span><h3>Amazon vs Flipkart</h3><p>How to compare the real deal: price, seller, delivery, warranty and returns.</p><a href="about.html">Our method →</a></article>
+<article class="guide"><span>03</span><h3>How to Spot a Good Deal</h3><p>A simple checklist for avoiding misleading discounts and weak-value products.</p><a href="about.html">Learn more →</a></article>
+<article class="guide"><span>04</span><h3>How to Choose the Right Power Bank</h3><p>Understand capacity, charging speed, USB-C, safety, size and value before buying.</p><a href="guide-power-banks.html">Learn more →</a></article>
+<article class="guide"><span>05</span><h3>Best Smartwatches Under ₹3,000</h3><p>Compare display, battery life, calling, fitness features and overall value before buying.</p><a href="guide-smartwatches.html">Learn more →</a></article>
+<article class="guide"><span>06</span><h3>Best Bluetooth Speakers Under ₹2,000</h3><p>Check sound, battery, portability, connectivity and durability before buying.</p><a href="guide-bluetooth-speakers.html">Learn more →</a></article>
+<article class="guide"><span>07</span><h3>How to Choose a Laptop Under ₹50,000</h3><p>Compare processor, RAM, SSD, display, battery and everyday usability.</p><a href="guide-laptops-under-50000.html">Learn more →</a></article>
+<article class="guide"><span>08</span><h3>Best Student Laptops Under ₹40,000</h3><p>Focus on study workloads, battery, keyboard, storage, portability and value.</p><a href="guide-student-laptops-under-40000.html">Learn more →</a></article>
+<article class="guide"><span>09</span><h3>Best Monitors Under ₹15,000</h3><p>Understand size, resolution, panel type, refresh rate, ports and ergonomics.</p><a href="guide-monitors-under-15000.html">Learn more →</a></article>
+<article class="guide"><span>10</span><h3>How to Choose the Right Jeans</h3><p>Compare fit, fabric, rise, stretch, size, wash, construction and value.</p><a href="guide-jeans.html">Learn more →</a></article>
+<article class="guide"><span>11</span><h3>How to Choose the Right Shoes</h3><p>Check fit, material, sole, comfort, durability and suitability for your use.</p><a href="guide-shoes.html">Learn more →</a></article>
+<article class="guide"><span>12</span><h3>How to Choose a Washing Machine</h3><p>Compare capacity, type, wash programs, efficiency, maintenance and service.</p><a href="guide-washing-machines.html">Learn more →</a></article>
+<article class="guide"><span>13</span><h3>How to Choose Engine Oil</h3><p>Understand viscosity, specifications, oil type, quantity and service intervals.</p><a href="guide-engine-oil.html">Learn more →</a></article>
+<article class="guide"><span>14</span><h3>How to Choose the Right Mattress</h3><p>Compare firmness, materials, size, sleeping position, heat and trial terms.</p><a href="guide-mattresses.html">Learn more →</a></article>
+<article class="guide"><span>15</span><h3>How to Choose an Office Chair</h3><p>Check seat dimensions, back support, adjustments, stability and warranty.</p><a href="guide-office-chairs.html">Learn more →</a></article>
+<article class="guide"><span>16</span><h3>How to Choose a Water Purifier</h3><p>Understand RO, UV, UF, TDS, storage, maintenance and running cost.</p><a href="guide-water-purifiers.html">Learn more →</a></article>
+<article class="guide"><span>17</span><h3>How to Choose the Right Smartphone</h3><p>Compare performance, display, cameras, battery, software support and connectivity.</p><a href="guide-smartphones.html">Learn more →</a></article>
+</div></div></section>
+<section class="section newsletter"><div class="container newsletter-inner"><div><div class="eyebrow">PRICE DROP WATCH</div><h2>Want better deals, not more noise?</h2><p>We’ll build price alerts and useful deal summaries once the live comparison engine is connected.</p></div><div class="coming">COMING SOON</div></div></section>
+</main>
+<footer><div class="container footer-grid"><div><a class="brand" href="#"><span class="brandmark">P</span><span>PriceCompare India</span></a><p>Compare first.<br>Buy second.</p></div><div><b>Explore</b><a href="#categories">Categories</a><a href="#deals">Comparisons</a><a href="#guides">Buying Guides</a></div><div><b>Company</b><a href="about.html">About & methodology</a><a href="disclosure.html">Affiliate disclosure</a><a href="privacy.html">Privacy</a></div></div><div class="copyright">© 2026 PriceCompare India. Marketplace names and trademarks belong to their respective owners.</div></footer>
+<script src="app.js"></script>
+</body></html>
