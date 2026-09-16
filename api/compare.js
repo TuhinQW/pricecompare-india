@@ -15,6 +15,29 @@ function validCoordinate(value, min, max) {
   return Number.isFinite(n) && n >= min && n <= max ? n : null;
 }
 
+function normalizeProviderData(data) {
+  if (!data?.data?.groups || !Array.isArray(data.data.groups)) return data;
+
+  const results = {};
+  for (const group of data.data.groups) {
+    const items = Array.isArray(group?.data) ? group.data : [];
+    for (const item of items) {
+      const platform = item?.platform?.name;
+      if (!platform) continue;
+      if (!results[platform]) results[platform] = [];
+      results[platform].push(item);
+    }
+  }
+
+  return {
+    ...data,
+    data: {
+      ...data.data,
+      results
+    }
+  };
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return json(res, 405, { ok: false, error: 'Method not allowed' });
 
@@ -64,7 +87,7 @@ module.exports = async function handler(req, res) {
         error: data?.error || data?.message || 'Marketplace provider returned an error.'
       });
     }
-    return json(res, 200, { ok: true, locationSource, provider: data });
+    return json(res, 200, { ok: true, locationSource, provider: normalizeProviderData(data) });
   } catch (error) {
     console.error('QuickCommerce API error:', error);
     return json(res, 502, { ok: false, error: 'Live marketplace service could not be reached.' });
