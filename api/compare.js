@@ -40,11 +40,9 @@ module.exports = async function handler(req, res) {
   }
 
   if (lat === null || lon === null) {
-    return json(res, 400, {
-      ok: false,
-      code: 'LOCATION_REQUIRED',
-      error: 'We could not determine an approximate location. Please allow location access and try again.'
-    });
+    lat = 22.5726;
+    lon = 88.3639;
+    locationSource = 'default-kolkata';
   }
 
   const url = new URL('https://api.quickcommerceapi.com/v1/groupsearch');
