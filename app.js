@@ -58,22 +58,90 @@ function getLocation() {
   });
 }
 
+function normalizeToken(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\b(true wireless|tws|bluetooth|wireless|earbuds|earphone|headphones|headset|in ear|with mic|smartphone|mobile phone)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenSet(value) {
+  return new Set(normalizeToken(value).split(" ").filter(t => t.length > 1));
+}
+
+function numericTokens(value) {
+  return (String(value || "").toLowerCase().match(/[a-z]*\d+[a-z\d-]*/g) || []).map(t => t.replace(/[^a-z0-9]/g, ""));
+}
+
+function brandCompatible(a, b) {
+  const aa = normalizeToken(a.brand);
+  const bb = normalizeToken(b.brand);
+  return !aa || !bb || aa === bb;
+}
+
+function quantityCompatible(a, b) {
+  if (!a.quantity || !b.quantity) return true;
+  const an = numericTokens(a.quantity);
+  const bn = numericTokens(b.quantity);
+  return !an.length || !bn.length || an.some(t => bn.includes(t));
+}
+
+function shouldMergeItems(a, b) {
+  if (!brandCompatible(a, b) || !quantityCompatible(a, b)) return false;
+  const aNums = numericTokens(a.name);
+  const bNums = numericTokens(b.name);
+  if (aNums.length && bNums.length && !aNums.some(t => bNums.includes(t))) return false;
+  const at = tokenSet(a.name);
+  const bt = tokenSet(b.name);
+  if (!at.size || !bt.size) return false;
+  const overlap = [...at].filter(t => bt.has(t)).length;
+  const union = new Set([...at, ...bt]).size;
+  return overlap / union >= 0.82;
+}
+
+function findCompatibleGroup(groups, item) {
+  const exact = normalizeToken(item.name);
+  for (const group of groups) {
+    if (group.key === exact) return group;
+  }
+  for (const group of groups) {
+    if (shouldMergeItems(group.matchItem, item)) return group;
+  }
+  return null;
+}
+
 function normalizeLive(provider) {
   const results = provider?.data?.results || {};
-  const groups = new Map();
+  const groups = [];
   Object.entries(results).forEach(([platform, items]) => {
     (Array.isArray(items) ? items : []).forEach(item => {
       const name = String(item.name || "").trim();
       if (!name) return;
-      const key = name.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-      if (!groups.has(key)) groups.set(key, { name, brand: item.brand || "", quantity: item.quantity || "", image: item.images?.[0] || item.image || "", offers: [] });
-      groups.get(key).offers.push({ platform: item.platform?.name || platform, price: item.offer_price ?? item.price, mrp: item.mrp, available: item.available ?? item.in_stock ?? true, quantity: item.quantity, image: item.images?.[0] || item.image, url: item.deeplink || item.url || "", sla: item.platform?.sla || "" });
+      const normalizedItem = { name, brand: item.brand || "", quantity: item.quantity || "" };
+      let group = findCompatibleGroup(groups, normalizedItem);
+      if (!group) {
+        group = { key: normalizeToken(name), name, brand: item.brand || "", quantity: item.quantity || "", image: item.images?.[0] || item.image || "", matchItem: normalizedItem, offers: [] };
+        groups.push(group);
+      }
+      group.offers.push({
+        platform: item.platform?.name || platform,
+        price: item.offer_price ?? item.price,
+        mrp: item.mrp,
+        available: item.available ?? item.in_stock ?? true,
+        quantity: item.quantity,
+        image: item.images?.[0] || item.image,
+        url: item.deeplink || item.url || "",
+        sla: item.platform?.sla || ""
+      });
     });
   });
-  return [...groups.values()].sort((a,b) => {
+  return groups.sort((a,b) => {
     const ap = Math.min(...a.offers.map(o => Number(o.price)).filter(Number.isFinite));
     const bp = Math.min(...b.offers.map(o => Number(o.price)).filter(Number.isFinite));
-    return ap - bp;
+    return (Number.isFinite(ap) ? ap : Infinity) - (Number.isFinite(bp) ? bp : Infinity);
   }).slice(0, 12);
 }
 
