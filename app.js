@@ -119,7 +119,22 @@ document.addEventListener("DOMContentLoaded", () => {
   if (input) input.addEventListener("keydown", e => { if (e.key === "Enter") searchProducts(); });
   render();
   loadProductsFromSupabase();
+  applyLiveCopy();
 });
+
+function applyLiveCopy() {
+  const topbar = document.querySelector(".topbar");
+  if (topbar) topbar.textContent = "Live marketplace comparison for Indian shoppers · Prices and availability update when you search.";
+
+  const heroNote = document.querySelector(".hero-card .tiny");
+  if (heroNote) heroNote.textContent = "Live comparison powered by connected marketplace data.";
+
+  const dealNote = document.querySelector("#deals .section-head .muted");
+  if (dealNote) dealNote.textContent = "Live marketplace data · location-aware results";
+
+  const newsletterText = document.querySelector(".newsletter p");
+  if (newsletterText) newsletterText.textContent = "Live price comparison is now connected. Price-drop intelligence and alerts are planned next.";
+}
 
 async function loadProductsFromSupabase() {
   try {
