@@ -50,13 +50,20 @@ module.exports = async function handler(req, res) {
   url.searchParams.set('lat', String(lat));
   url.searchParams.set('lon', String(lon));
   url.searchParams.set('platforms', platforms.join(','));
+  url.searchParams.set('group', 'true');
 
   try {
     const upstream = await fetch(url, { headers: { 'X-API-Key': apiKey, Accept: 'application/json' } });
     const text = await upstream.text();
     let data = null;
     try { data = JSON.parse(text); } catch (_) {}
-    if (!upstream.ok) return json(res, upstream.status >= 500 ? 502 : upstream.status, { ok: false, error: data?.error || data?.message || 'Marketplace provider returned an error.' });
+    if (!upstream.ok) {
+      console.error('QuickCommerce provider error:', upstream.status, data || text.slice(0, 300));
+      return json(res, upstream.status >= 500 ? 502 : upstream.status, {
+        ok: false,
+        error: data?.error || data?.message || 'Marketplace provider returned an error.'
+      });
+    }
     return json(res, 200, { ok: true, locationSource, provider: data });
   } catch (error) {
     console.error('QuickCommerce API error:', error);
