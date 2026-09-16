@@ -148,10 +148,19 @@ function normalizeLive(provider) {
 async function liveSearch(q) {
   const clean = q.trim();
   if (clean.length < 2) { showStatus("Enter at least 2 characters to search.", "error"); return; }
-  showStatus("Getting your location and checking live marketplace prices…");
+  showStatus("Checking live marketplace prices…");
   try {
-    const loc = await getLocation();
-    const params = new URLSearchParams({ q: clean, lat: loc.lat.toFixed(6), lon: loc.lon.toFixed(6), platforms: "BlinkIt,Zepto,Swiggy,BigBasket,Amazon,Flipkart" });
+    let loc = null;
+    try {
+      loc = await getLocation();
+    } catch (_) {
+      showStatus("Using approximate location from your connection…");
+    }
+    const params = new URLSearchParams({ q: clean, platforms: "BlinkIt,Zepto,Swiggy,BigBasket,Amazon,Flipkart" });
+    if (loc) {
+      params.set("lat", loc.lat.toFixed(6));
+      params.set("lon", loc.lon.toFixed(6));
+    }
     const response = await fetch(`/api/compare?${params.toString()}`, { headers: { Accept: "application/json" } });
     const payload = await response.json();
     if (!response.ok || !payload.ok) throw new Error(payload.error || "Live comparison failed.");
