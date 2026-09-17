@@ -28,10 +28,23 @@ function liveCard(group) {
   return `<article class="product-card live-card"><div class="pimg">${image}</div><div class="pbody"><div class="tag">LIVE COMPARISON</div><h3>${escapeHtml(group.name)}</h3>${group.brand ? `<div class="rating">${escapeHtml(group.brand)}${group.quantity ? ` · ${escapeHtml(group.quantity)}` : ""}</div>` : ""}<div class="live-offers">${rows}</div><div class="best">Best available price <b>${money(lowest)}</b>${savings ? `<span> · ${money(savings)} below MRP</span>` : ""}</div></div></article>`;
 }
 
+function amazonCard(item) {
+  const price = item.extracted_price ?? item.price;
+  const oldPrice = item.extracted_old_price ?? item.old_price;
+  const image = item.image ? `<img src="${escapeHtml(item.image)}" alt="" loading="lazy" style="max-width:100%;max-height:110px;object-fit:contain">` : "🛒";
+  const rating = item.rating != null ? `★ ${escapeHtml(item.rating)}` : "";
+  const reviews = item.reviews != null ? ` · ${escapeHtml(item.reviews)} reviews` : "";
+  const availability = item.availability ? escapeHtml(item.availability) : "Availability not provided";
+  const delivery = Array.isArray(item.delivery) && item.delivery.length ? escapeHtml(item.delivery.join(" · ")) : "";
+  const affiliate = item.affiliate_url || "#";
+  const old = oldPrice != null && Number(oldPrice) > Number(price) ? `<small>MRP/old price ${money(oldPrice)}</small>` : "";
+  return `<article class="product-card live-card"><div class="pimg">${image}</div><div class="pbody"><div class="tag">AMAZON INDIA · LIVE SEARCH</div><h3>${escapeHtml(item.title)}</h3><div class="rating">${rating}${reviews}</div><div class="live-offer"><div><small>${availability}</small>${delivery ? `<small>${delivery}</small>` : ""}</div><div><strong>${money(price)}</strong>${old}</div><a href="${escapeHtml(affiliate)}" target="_blank" rel="nofollow sponsored noopener">Buy on Amazon ↗</a></div><div class="best">Affiliate link <b>${item.affiliate_enabled ? "Verified tag applied by server" : "Not configured"}</b></div></div></article>`;
+}
+
 function render(list = currentProducts, live = false) {
   const results = document.querySelector("#results");
   if (!results) return;
-  results.innerHTML = list.length ? (live ? list.map(liveCard).join("") : list.map(demoCard).join("")) : `<div class="empty">No matching product found. Try a more specific search.</div>`;
+  results.innerHTML = list.length ? (live ? list.map(amazonCard).join("") : list.map(demoCard).join("")) : `<div class="empty">No matching product found. Try a more specific search.</div>`;
 }
 
 function showStatus(message, type = "info") {
@@ -148,30 +161,20 @@ function normalizeLive(provider) {
 async function liveSearch(q) {
   const clean = q.trim();
   if (clean.length < 2) { showStatus("Enter at least 2 characters to search.", "error"); return; }
-  showStatus("Checking live marketplace prices…");
+  showStatus("Checking live Amazon results…");
   try {
-    let loc = null;
-    try {
-      loc = await getLocation();
-    } catch (_) {
-      showStatus("Using approximate location from your connection…");
-    }
-    const params = new URLSearchParams({ q: clean, platforms: "BlinkIt,Zepto,Swiggy,BigBasket,Amazon,Flipkart" });
-    if (loc) {
-      params.set("lat", loc.lat.toFixed(6));
-      params.set("lon", loc.lon.toFixed(6));
-    }
-    const response = await fetch(`/api/compare?${params.toString()}`, { headers: { Accept: "application/json" } });
+    const params = new URLSearchParams({ q: clean });
+    const response = await fetch(`/api/amazon-search?${params.toString()}`, { headers: { Accept: "application/json" } });
     const payload = await response.json();
-    if (!response.ok || !payload.ok) throw new Error(payload.error || "Live comparison failed.");
-    const groups = normalizeLive(payload.provider);
-    if (!groups.length) { showStatus("No live matching products were returned. Try a more specific product name.", "info"); render([], true); return; }
-    render(groups, true);
-    showStatus(`Live prices found across ${payload.provider?.data?.platforms?.length || 0} marketplaces.`, "success");
+    if (!response.ok || !payload.ok) throw new Error(payload.error || "Live Amazon search failed.");
+    const results = Array.isArray(payload.results) ? payload.results : [];
+    if (!results.length) { showStatus("No live Amazon matching products were returned. Try a more specific product name.", "info"); render([], true); return; }
+    render(results, true);
+    showStatus(`Live Amazon results found: ${results.length}.`, "success");
     document.querySelector("#deals")?.scrollIntoView({ behavior: "smooth" });
   } catch (error) {
     console.error(error);
-    showStatus(error.message || "Live comparison is unavailable right now.", "error");
+    showStatus(error.message || "Live Amazon comparison is unavailable right now.", "error");
     render(currentProducts, false);
   }
 }
@@ -201,16 +204,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function applyLiveCopy() {
   const topbar = document.querySelector(".topbar");
-  if (topbar) topbar.textContent = "Live marketplace comparison for Indian shoppers · Prices and availability update when you search.";
+  if (topbar) topbar.textContent = "Live Amazon marketplace search · Prices and availability are checked when you search.";
 
   const heroNote = document.querySelector(".hero-card .tiny");
-  if (heroNote) heroNote.textContent = "Live comparison powered by connected marketplace data.";
+  if (heroNote) heroNote.textContent = "Live Amazon results are fetched server-side.";
 
   const dealNote = document.querySelector("#deals .section-head .muted");
-  if (dealNote) dealNote.textContent = "Live marketplace data · location-aware results";
+  if (dealNote) dealNote.textContent = "Live Amazon data · server-side search";
 
   const newsletterText = document.querySelector(".newsletter p");
-  if (newsletterText) newsletterText.textContent = "Live price comparison is now connected. Price-drop intelligence and alerts are planned next.";
+  if (newsletterText) newsletterText.textContent = "Live Amazon product search is now connected. Multi-marketplace comparison can be added next.";
 }
 
 async function loadProductsFromSupabase() {
